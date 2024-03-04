@@ -1,0 +1,139 @@
+--- 
+title: "Palmer Penguins"
+author: "Cobblepot Analytics"
+format: 
+  dashboard:
+    orientation: columns
+    logo: "images/notpenguins.jpg"
+    nav-buttons: [linkedin, twitter, github]
+---
+
+
+
+```{ojs}
+//| include: false
+value = 12
+```
+
+
+
+```{python}
+#| context: setup
+#| output: false
+
+import seaborn as sns
+from shiny import render, reactive, ui
+penguins = sns.load_dataset("penguins")
+
+ojs_define(pythondata = penguins)
+```
+
+```{ojs}
+//| output: false
+
+data = transpose(pythondata)
+
+
+filtered = data.filter(function(penguin) {
+  return bill_length_min < penguin.bill_length_mm &&
+         islands.includes(penguin.island);
+})
+```
+
+# {.sidebar}
+
+![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fpixnio.com%2Ffree-images%2F2017%2F09%2F26%2F2017-09-26-07-22-55.jpg&f=1&nofb=1&ipt=03fd53ddf4d6ad35bc0b86fe6edb6b601ee5f622ba85b48096fc997d49df6a36&ipo=images){width="80%"}
+
+```{ojs}
+viewof bill_length_min = Inputs.range(
+  [32, 50], 
+  {value: 35, step: 1, label: "Bill length (min):"}
+)
+viewof islands = Inputs.checkbox(
+  ["Torgersen", "Biscoe", "Dream"], 
+  { value: ["Torgersen", "Biscoe", "Dream"], 
+    label: "Islands:"
+  }
+)
+```
+
+::: {.valuebox icon="pencil" color="primary"}
+Articles per day
+
+`{ojs} value`
+:::
+
+# Design A
+
+## Column1
+
+::: {.card title="My Plot"}
+```{ojs}
+
+Plot.rectY(filtered, 
+  Plot.binX(
+    {y: "count"}, 
+    {x: "body_mass_g", fill: "species", thresholds: 20}
+  ))
+  .plot({
+    facet: {
+      data: filtered,
+      x: "sex",
+      y: "species",
+      marginRight: 80
+    },
+    marks: [
+      Plot.frame(),
+    ]
+  }
+)
+```
+
+:::
+
+
+## Column2
+
+::: {.card title="My Table"}
+
+```{ojs}
+Inputs.table(filtered)
+```
+
+:::
+
+# Design B
+
+## Column {width=60%}
+
+```{ojs}
+Plot.rectY(filtered, 
+  Plot.binX(
+    {y: "count"}, 
+    {x: "body_mass_g", fill: "species", thresholds: 20}
+  ))
+  .plot({
+    facet: {
+      data: filtered,
+      x: "sex",
+      y: "species",
+      marginRight: 80
+    },
+    marks: [
+      Plot.frame(),
+    ]
+  }
+)
+```
+
+## Column {width=40%}
+
+::: {.valuebox icon="pencil" color="primary"}
+Articles per day
+
+`{ojs} value`
+:::
+
+```{ojs}
+Inputs.table(filtered)
+```
